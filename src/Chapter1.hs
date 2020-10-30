@@ -580,7 +580,12 @@ False
 -}
 isVowel :: Char -> Bool
 isVowel c
-  | c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y' = True
+  | c == 'a' = True
+  | c == 'e' = True
+  | c == 'i' = True
+  | c == 'o' = True
+  | c == 'u' = True
+  | c == 'y' = True
   | otherwise = False
 
 
@@ -648,9 +653,8 @@ specifying complex expressions.
 sumLast2 :: Int -> Int
 sumLast2 n = x + y
   where
-    last2 = (abs n) `mod` 100
-    x = last2 `div` 10
-    y = last2 `mod` 10
+    last2 = abs n `mod` 100
+    (x, y) = last2 `divMod` 10
 
 
 {- |
