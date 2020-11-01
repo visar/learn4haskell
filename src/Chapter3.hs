@@ -400,7 +400,7 @@ fight knight monster
 
 
 {- |
-=🛡= SUM types
+=🛡= Sum types
 
 Another powerful ambassador of ADT is __sum type__. Unlike ordinary records
 (product types) that always have all the fields you wrote, sum types represent
@@ -540,7 +540,7 @@ population city = sum (map housePeople (houses city))
 
 buildWall :: City -> City
 buildWall city = case castle city of
-  Just _ -> if population city >= 10 then city else city { wall = Just Wall}
+  Just _ -> if population city >= 10 then city { wall = Just Wall} else city
   Nothing -> city
 
 
@@ -995,6 +995,27 @@ Implement instances of "Append" for the following types:
 class Append a where
     append :: a -> a -> a
 
+newtype Gold = Gold { unGold :: Int }
+
+data List a
+    = Empty
+    | Cons a (List a)
+
+instance Append Gold where
+  append g1 g2 = Gold { unGold = unGold g1 + unGold g2 }
+
+instance Append (List a) where
+  append l1 l2 = appendAcc l1 l2 Empty where
+    reverseList :: List a -> List a
+    reverseList l = reverseAcc l Empty
+
+    reverseAcc :: List a -> List a -> List a
+    reverseAcc (Cons h t) acc = reverseAcc t (Cons h acc)
+    reverseAcc _                acc = acc
+
+    appendAcc (Cons h1 t1) l2                  acc = appendAcc t1 l2 (Cons h1 acc)
+    appendAcc Empty               (Cons h2 t2) acc = appendAcc Empty t2 (Cons h2 acc)
+    appendAcc _                   _            acc = reverseList acc
 
 {-
 =🛡= Standard Typeclasses and Deriving
@@ -1055,6 +1076,19 @@ implement the following functions:
 
 🕯 HINT: to implement this task, derive some standard typeclasses
 -}
+data DayOfWeek = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday deriving (Show, Enum)
+
+isWeekend :: DayOfWeek -> Bool
+isWeekend Saturday = True
+isWeekend Sunday = True
+isWeekend _ = False
+
+nextDay :: DayOfWeek -> DayOfWeek
+nextDay Sunday = Monday
+nextDay day = succ day
+
+daysToParty :: DayOfWeek -> Int
+daysToParty day = (fromEnum Friday - fromEnum day) `mod` 7
 
 {-
 =💣= Task 9*
