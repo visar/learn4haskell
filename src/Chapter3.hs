@@ -514,13 +514,13 @@ After defining the city, implement the following functions:
    and at least 10 living __people__ inside in all houses of the city totally.
 -}
 
-data Castle = MkCastle { castleName :: String }
+newtype Castle = MkCastle { castleName :: String }
 
 data Wall = Wall
 
 data ThridObject = Church | Library
 
-data House = MkHouse { housePeople :: Int }
+newtype House = MkHouse { housePeople :: Int }
 
 data City = MkCity
   { castle :: Maybe Castle
@@ -1013,7 +1013,7 @@ instance Append (List a) where
     reverseAcc (Cons h t) acc = reverseAcc t (Cons h acc)
     reverseAcc _                acc = acc
 
-    appendAcc (Cons h1 t1) l2                  acc = appendAcc t1 l2 (Cons h1 acc)
+    appendAcc (Cons h1 t1) l                   acc = appendAcc t1 l (Cons h1 acc)
     appendAcc Empty               (Cons h2 t2) acc = appendAcc Empty t2 (Cons h2 acc)
     appendAcc _                   _            acc = reverseList acc
 
