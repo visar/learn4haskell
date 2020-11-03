@@ -348,7 +348,9 @@ ghci> :l src/Chapter2.hs
 -}
 subList :: Int -> Int -> [a] -> [a]
 subList start end list
-  | start < 0 || end < 0 = []
+  | start < 0 = []
+  | end < 0 = []
+  | start > end = []
   | otherwise = take (end - start + 1) (drop start list)
 
 {- |
@@ -747,7 +749,7 @@ value of the element itself
 🕯 HINT: Use combination of 'map' and 'replicate'
 -}
 smartReplicate :: [Int] -> [Int]
-smartReplicate = foldr (\x -> (++) (replicate x x)) []
+smartReplicate = concatMap (\x -> replicate x x)
 
 
 {- |
@@ -763,9 +765,7 @@ the list with only those lists that contain a passed element.
 -}
 contains :: (Eq a) => a -> [[a]] -> [[a]]
 contains _ [] = []
-contains e (x: xs)
-  | e `elem` x = x : contains e xs
-  | otherwise = contains e xs
+contains e l = filter (elem e) l
 
 
 {- |
@@ -890,7 +890,10 @@ and reverses it.
 -}
 rewind :: [a] -> [a]
 rewind [] = []
-rewind (x: xs) = rewind xs ++ [x]
+rewind l = go l [] where
+  go :: [a] -> [a] -> [a]
+  go [] acc = acc
+  go (x : xs) acc = go xs (x:acc)
 
 
 {-
