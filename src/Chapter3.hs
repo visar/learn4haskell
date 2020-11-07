@@ -999,23 +999,14 @@ newtype Gold = Gold { unGold :: Int }
 
 data List a
     = Empty
-    | Cons a (List a)
+    | Cons a (List a) deriving (Show)
 
 instance Append Gold where
   append g1 g2 = Gold { unGold = unGold g1 + unGold g2 }
 
 instance Append (List a) where
-  append l1 l2 = appendAcc l1 l2 Empty where
-    reverseList :: List a -> List a
-    reverseList l = reverseAcc l Empty
-
-    reverseAcc :: List a -> List a -> List a
-    reverseAcc (Cons h t) acc = reverseAcc t (Cons h acc)
-    reverseAcc _                acc = acc
-
-    appendAcc (Cons h1 t1) l                   acc = appendAcc t1 l (Cons h1 acc)
-    appendAcc Empty               (Cons h2 t2) acc = appendAcc Empty t2 (Cons h2 acc)
-    appendAcc _                   _            acc = reverseList acc
+  append Empty l2 = l2
+  append (Cons h t) l2 = Cons h (append t l2)
 
 {-
 =🛡= Standard Typeclasses and Deriving
@@ -1076,7 +1067,7 @@ implement the following functions:
 
 🕯 HINT: to implement this task, derive some standard typeclasses
 -}
-data DayOfWeek = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday deriving (Show, Enum)
+data DayOfWeek = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday deriving (Show, Enum, Bounded, Eq)
 
 isWeekend :: DayOfWeek -> Bool
 isWeekend Saturday = True
@@ -1084,8 +1075,9 @@ isWeekend Sunday = True
 isWeekend _ = False
 
 nextDay :: DayOfWeek -> DayOfWeek
-nextDay Sunday = Monday
-nextDay day = succ day
+nextDay day
+  | day == maxBound = minBound
+  | otherwise = succ day
 
 daysToParty :: DayOfWeek -> Int
 daysToParty day = (fromEnum Friday - fromEnum day) `mod` 7
