@@ -520,28 +520,41 @@ data Wall = Wall
 
 data ThridObject = Church | Library
 
-newtype House = MkHouse { housePeople :: Int }
+newtype NumberOfPeople = NumberOfPeople { number :: Int }
+toNumber :: Int -> Maybe NumberOfPeople
+toNumber 1 = Just (NumberOfPeople 1)
+toNumber 2 = Just (NumberOfPeople 2)
+toNumber 3 = Just (NumberOfPeople 3)
+toNumber 4 = Just (NumberOfPeople 4)
+toNumber _ = Nothing
+
+newtype House = MkHouse { housePeople :: NumberOfPeople }
+
+data CastleWall = CastleWall { castle :: Castle, wall :: Maybe Wall }
 
 data City = MkCity
-  { castle :: Maybe Castle
-  , wall :: Maybe Wall
+  { castleWall :: Maybe CastleWall
   , object :: ThridObject
   , houses :: [House]
   }
 
 buildCastle :: String -> City -> City
-buildCastle name city = city { castle = Just MkCastle { castleName = name } }
+buildCastle name city = case castleWall city of
+  Just c@(CastleWall _ _) -> city { castleWall = Just c { castle = MkCastle { castleName = name } } }
+  Nothing                 -> city { castleWall = Just CastleWall { castle = MkCastle { castleName = name }, wall = Nothing } }
 
 buildHouse :: Int -> City -> City
-buildHouse people city = city { houses = MkHouse people : houses city }
+buildHouse people city = case toNumber people of
+  Just n -> city { houses = MkHouse n : houses city }
+  Nothing -> city
 
 population :: City -> Int
-population city = sum (map housePeople (houses city))
+population city = sum (map (number . housePeople) (houses city))
 
 buildWall :: City -> City
-buildWall city = case castle city of
-  Just _ -> if population city >= 10 then city { wall = Just Wall} else city
-  Nothing -> city
+buildWall city = case castleWall city of
+  Just c@(CastleWall _ _) -> if population city >= 10 then city { castleWall = Just c { wall = Just Wall } } else city
+  Nothing                 -> city
 
 
 {-
